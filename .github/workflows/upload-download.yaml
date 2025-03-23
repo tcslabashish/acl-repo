@@ -1,0 +1,40 @@
+name: factstore
+on: 
+  workflow_dispatch:
+  push: 
+    branches:
+      - main
+jobs:
+  build:
+    name: ci build
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: create artifact
+        run: |
+          mkdir target
+          echo "hello world" > target/data.txt
+      - name: upload to factstore
+        uses: actions/upload-artifact@v4
+        with:
+          name: bimal
+          path: target/data.txt
+  container:
+    name: ci container
+    needs: [ build ]
+    environment: 'prd'
+    runs-on: ubuntu-latest
+    steps:
+      - name: create artifact
+        run: echo "create "
+      - name: download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: bimal
+          path: target
+      - name: cat file
+        run: |
+          echo ------file-----
+          ls -lhtr
+          cat target/data.txt
